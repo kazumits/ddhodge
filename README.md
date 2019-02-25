@@ -23,24 +23,65 @@ Methods
 
 *In preparation*
 
-Example workflow
-----------------
+Example
+-------
 
 This is a basic example which shows you how to dissect the pseudo-time flow, which we define here as a potential flow (through diffusion maps), of the single-cell RNA-seq data by Treutlein et. al.. ddhodge can further extract and visualize *sink* and *source* information as a divercence of the extracted flow.
 
+### Load packages
+
+Please confirm that these packages are installed before trying this example.
+
 ``` r
 library(ddhodge)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+library(readr)
 library(ggsci)
 library(ggraph)
 #> Loading required package: ggplot2
+```
 
-# fibrablast reprogramming data
-X <- t(dyno::fibroblast_reprogramming_treutlein$counts)
-group <- dyno::fibroblast_reprogramming_treutlein$grouping
+#### Load scRNA-seq data
 
-# ddhode part: specify input data and roots
-g <- diffusionGraph(X,group=="MEF")
+Load data of from [GSE6731](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE67310) (Treutlein et. al., 2016).
 
+``` r
+dat <- read_tsv("https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE67310&format=file&file=GSE67310%5FiN%5Fdata%5Flog2FPKM%5Fannotated.txt.gz")
+#> Parsed with column specification:
+#> cols(
+#>   .default = col_double(),
+#>   cell_name = col_character(),
+#>   assignment = col_character(),
+#>   experiment = col_character()
+#> )
+#> See spec(...) for full column specifications.
+group <- dat %>% filter(assignment!="Fibroblast") %>%
+  with(setNames(assignment,cell_name))
+X <- dat %>% filter(assignment!="Fibroblast") %>%
+  dplyr::select(-(1:5)) %>% as.matrix %>% t
+# revert to FPKM and drop genes with var.=0
+X <- 2^X[apply(X,1,var)>0,]-1 
+```
+
+#### The ddhodge part
+
+Specify input data matrix and roots (starting points).
+
+``` r
+g <- diffusionGraph(X,group=="MEF",k=30,lambda=1e-4)
+```
+
+#### Drawings
+
+``` r
 # visualization using ggraph package
 set.seed(33) 
 igraph::V(g)$group <- group
@@ -51,27 +92,43 @@ ggraph(lo) + ggtitle("Gradient") + theme_void() +
     aes(width=weight),
     colour="black",
     arrow=arrow(length=unit(1.2,"mm")),
-    end_cap = circle(1.2,'mm'), alpha=0.6,
+    end_cap = circle(1.2,'mm'), alpha=0.33,
   ) + scale_edge_width(range=c(0.2,0.8)) +
   geom_node_point(aes(colour=group),size=2) +
   scale_color_d3("category20")
 ```
 
-<img src="man/figures/README-unnamed-chunk-1-1.png" width="100%" />
+<img src="man/figures/README-drawGraph-1.png" width="100%" />
 
 ``` r
 
 ggraph(lo) + ggtitle("Divergence") + theme_void() +
   geom_edge_link(
-      aes(width=weight),colour="black",
+      aes(width=weight),
+      colour="black",
       arrow=arrow(length=unit(1.2,"mm")),
-      end_cap = circle(1.2,'mm'), alpha=0.6,
+      end_cap = circle(1.2,'mm'), alpha=0.33,
   ) + scale_edge_width(range=c(0.2,0.8)) +
   geom_node_point(aes(colour=div,size=div^2)) +
   scale_color_gradient2(low="blue",mid="grey",high="red")
 ```
 
-<img src="man/figures/README-unnamed-chunk-1-2.png" width="100%" />
+<img src="man/figures/README-drawGraph-2.png" width="100%" />
+
+``` r
+
+ggraph(lo) + ggtitle("Potential") + theme_void() +
+  geom_edge_link(
+      aes(width=weight),
+      colour="black",
+      arrow=arrow(length=unit(1.2,"mm")),
+      end_cap = circle(1.2,'mm'), alpha=0.33,
+  ) + scale_edge_width(range=c(0.2,0.8)) +
+  geom_node_point(aes(colour=u),size=2) +
+  scale_color_viridis()
+```
+
+<img src="man/figures/README-drawGraph-3.png" width="100%" />
 
 TODO
 ----
@@ -79,6 +136,5 @@ TODO
 -   Add more examples and documentations
 -   Extracting nodes along specified paths (e.g., from source to sink)
 -   Assessing cluster-to-cluster flow for coarse-grained interpretation of data
--   Construction of causal graph structure involving cyclic flows
+-   Construction of causal graph structure including cyclic flows
 -   Pseudo-dynamics reconstruction using extracted pseudo-time structures
--   benchmark for [dyno](https://github.com/dynverse/dyno)

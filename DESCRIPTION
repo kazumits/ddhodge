@@ -2,8 +2,8 @@ Package: ddhodge
 Title: Modeling Latent Flow Structure using Hodge Decomposition
 Version: 0.1
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Kazumitsu",
+           family = "Maehara",
            role = c("aut", "cre"),
            email = "kazumits@bioreg.kyushu-u.ac.jp")
 Description: Giving a feasible flow structure against the hodge-podge collection of data points. `ddhodge` helps to interpret/visualize the large-scale data sets including, but not limited to, single-cell RNA-seq data.
