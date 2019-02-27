@@ -13,13 +13,10 @@ LazyData: true
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,
-    rmarkdown,
-    spelling
-VignetteBuilder: knitr
+    rmarkdown
 Imports: 
     Matrix,
-    igraph,
-    glmnet
+    igraph
 Language: en-US
 URL: https://github.com/kazumits/ddhodge
 BugReports: https://github.com/kazumits/ddhodge/issues

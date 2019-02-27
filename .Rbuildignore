@@ -4,3 +4,4 @@
 ^LICENSE\.md$
 ^ddhodge\.Rproj$
 ^\.Rproj\.user$
+^.*_cache$

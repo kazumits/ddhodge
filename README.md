@@ -26,27 +26,18 @@ Methods
 Example
 -------
 
-This is a basic example which shows you how to dissect the pseudo-time flow, which we define here as a potential flow (through diffusion maps), of the single-cell RNA-seq data by Treutlein et. al.. ddhodge can further extract and visualize *sink* and *source* information as a divercence of the extracted flow.
+This is a basic example which shows you how to dissect the pseudo-time flow, which we define here as a potential flow (defined through diffusion process), of the single-cell RNA-seq data. ddhodge can further extract and visualize *sink* and *source* information as a divercence of the extracted flow.
 
-### Load packages
+#### Load packages
 
 Please confirm that these packages are installed before trying this example.
 
 ``` r
 library(ddhodge)
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 library(readr)
 library(ggsci)
 library(ggraph)
-#> Loading required package: ggplot2
 ```
 
 #### Load scRNA-seq data
@@ -54,21 +45,11 @@ library(ggraph)
 Load data of from [GSE6731](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE67310) (Treutlein et. al., 2016).
 
 ``` r
-dat <- read_tsv("https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE67310&format=file&file=GSE67310%5FiN%5Fdata%5Flog2FPKM%5Fannotated.txt.gz")
-#> Parsed with column specification:
-#> cols(
-#>   .default = col_double(),
-#>   cell_name = col_character(),
-#>   assignment = col_character(),
-#>   experiment = col_character()
-#> )
-#> See spec(...) for full column specifications.
-group <- dat %>% filter(assignment!="Fibroblast") %>%
-  with(setNames(assignment,cell_name))
-X <- dat %>% filter(assignment!="Fibroblast") %>%
-  dplyr::select(-(1:5)) %>% as.matrix %>% t
+dat <- read_tsv("https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE67310&format=file&file=GSE67310%5FiN%5Fdata%5Flog2FPKM%5Fannotated.txt.gz") %>% filter(assignment!="Fibroblast") 
+group <- with(dat,setNames(assignment,cell_name))
+X <- dat[,-(1:5)] %>% as.matrix %>% t
 # revert to FPKM and drop genes with var.=0
-X <- 2^X[apply(X,1,var)>0,]-1 
+X <- 2^X[apply(X,1,var)>0,] - 1 
 ```
 
 #### The ddhodge part
@@ -76,40 +57,37 @@ X <- 2^X[apply(X,1,var)>0,]-1
 Specify input data matrix and roots (starting points).
 
 ``` r
-g <- diffusionGraph(X,group=="MEF",k=30,lambda=1e-4)
+g <- diffusionGraph(X,group=="MEF",k=7,ndc=40) 
 ```
 
-#### Drawings
+#### Visualizations
 
 ``` r
-# visualization using ggraph package
-set.seed(33) 
-igraph::V(g)$group <- group
-lo <- create_layout(g,"nicely")
-
-ggraph(lo) + ggtitle("Gradient") + theme_void() +
+dggraph <- function(g,...)
+  ggraph(g) + theme_void() +
   geom_edge_link(
     aes(width=weight),
     colour="black",
-    arrow=arrow(length=unit(1.2,"mm")),
-    end_cap = circle(1.2,'mm'), alpha=0.33,
-  ) + scale_edge_width(range=c(0.2,0.8)) +
-  geom_node_point(aes(colour=group),size=2) +
-  scale_color_d3("category20")
+    arrow=arrow(length=unit(1.8,"mm")),
+    end_cap = circle(1.2,'mm'), alpha=0.6,
+  ) + scale_edge_width(range=c(0.2,0.5)) +
+  geom_node_point(...)
+
+igraph::V(g)$group <- group
+set.seed(123) # for reproducible graph layout
+lo <- create_layout(g,"nicely")
+
+dggraph(lo,aes(colour=group),size=2) +
+  ggtitle("Sparse reconstruction of diffusion process (k=7)") +
+  scale_color_d3("category10")
 ```
 
 <img src="man/figures/README-drawGraph-1.png" width="100%" />
 
 ``` r
 
-ggraph(lo) + ggtitle("Divergence") + theme_void() +
-  geom_edge_link(
-      aes(width=weight),
-      colour="black",
-      arrow=arrow(length=unit(1.2,"mm")),
-      end_cap = circle(1.2,'mm'), alpha=0.33,
-  ) + scale_edge_width(range=c(0.2,0.8)) +
-  geom_node_point(aes(colour=div,size=div^2)) +
+dggraph(lo,aes(colour=div,size=div^2)) +
+  ggtitle("Divergence tells us the source and sink.") +
   scale_color_gradient2(low="blue",mid="grey",high="red")
 ```
 
@@ -117,18 +95,22 @@ ggraph(lo) + ggtitle("Divergence") + theme_void() +
 
 ``` r
 
-ggraph(lo) + ggtitle("Potential") + theme_void() +
-  geom_edge_link(
-      aes(width=weight),
-      colour="black",
-      arrow=arrow(length=unit(1.2,"mm")),
-      end_cap = circle(1.2,'mm'), alpha=0.33,
-  ) + scale_edge_width(range=c(0.2,0.8)) +
-  geom_node_point(aes(colour=u),size=2) +
+dggraph(lo,aes(colour=u),size=2) +
+  ggtitle("Potential is considered to be a pseudo-time.") +
   scale_color_viridis()
 ```
 
 <img src="man/figures/README-drawGraph-3.png" width="100%" />
+
+``` r
+
+create_layout(g,"tree") %>%
+  dggraph(aes(colour=group),size=2) +
+  ggtitle("Tree layout is possible because the flow is purely DAG.") +
+  scale_color_d3("category10")
+```
+
+<img src="man/figures/README-drawGraph-4.png" width="100%" />
 
 TODO
 ----

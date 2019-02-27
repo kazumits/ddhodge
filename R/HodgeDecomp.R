@@ -87,7 +87,8 @@ laplacian1 <- function(g)
 potential <- function(g,bias=0) {
   L <- igraph::laplacian_matrix(igraph::as.undirected(g),weight=NA)
   # Solve the normal equation
-  p <- Matrix::solve(Matrix::qr(L + bias*diag(ncol(L))),-div(g))
+  p <- Matrix::solve(Matrix::qr(L),-div(g))
+  #p <- Matrix::solve(Matrix::qr(L + bias*diag(ncol(L))),-div(g))
   #p <- drop(qr.fitted(qr(L + bias*diag(ncol(L))),-div(g)))
   #p <- drop(solve(qr(laplacian0(g)),-div(g)))
   p <- as.numeric(p)
@@ -101,7 +102,7 @@ potential <- function(g,bias=0) {
 #' @param g igraph object
 #' @param bias bias term in ridge regression
 #' @export
-grad <- function(g,bias=0) drop(gradop(g)%*%potential(g,bias))
+grad <- function(g,bias=0) as.numeric(gradop(g)%*%potential(g,bias))
 
 #' Divergence of nodes
 #'

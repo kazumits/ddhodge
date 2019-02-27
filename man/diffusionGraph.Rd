@@ -4,28 +4,25 @@
 \alias{diffusionGraph}
 \title{Construction of diffusion graph}
 \usage{
-diffusionGraph(X, roots, j = 7, k = 11, s = 1, ndc = 10,
-  npc = min(1000, dim(X)), lambda = 1e-04, alpha = 0.5,
-  sigma = NULL)
+diffusionGraph(X, roots, k = 11, npc = min(1000, dim(X)), ndc = 40,
+  s = 1, j = 7, lambda = 1e-04, sigma = NULL)
 }
 \arguments{
-\item{X}{data matrix (column: samples, rows: variables)}
+\item{X}{data matrix (row: n samples, rows: p variables)}
 
 \item{roots}{indices of columns of X or logical vector; start points of diffusion (i.e., the initial density is 1/n at specified n points).}
 
-\item{j}{integer; use j-th nearest neighbouor in local scaling of sigma}
-
 \item{k}{integer; number of nearest neighbours to construct initial k-NN graph}
-
-\item{s}{numeric; time parameter of diffusion maps.}
-
-\item{ndc}{integer; number of diffusion components in calculating diffusion distance.}
 
 \item{npc}{integer; number of principal components in calculating euclid distance.}
 
-\item{lambda}{numeric; LASSO penalty of elasticnet}
+\item{ndc}{integer; number of diffusion components in calculating diffusion distance.}
 
-\item{alpha}{numeric; mixing perameter of ridge:0 and LASSO:1 (defaut: 0.5)}
+\item{s}{numeric; time parameter of diffusion maps.}
+
+\item{j}{integer; use j-th nearest neighbouor in local scaling of sigma}
+
+\item{lambda}{numeric; ridge penalty in pulling back divergence}
 
 \item{sigma}{numeric; fixed sigma for isotropic diffusion}
 }
