@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 
 *Modeling Latent Flow Structure using Hodge Decomposition*
 
-The goal of ddhodge is to be a toolkit to analyse a underlying "flow" structure (e.g., time or causal relations) in the *hodge-podge* collection of data points. ddhodge will help to interpret/visualize the large data sets including, but not limited to, high-throughput measurements of biological data (e.g., single-cell RNA-seq) which we mainly focus on. 
+The goal of ddhodge is to be a toolkit to analyse underlying "flow" structure (e.g., time or causal relations) in the *hodge-podge* collection of data points. ddhodge will help to interpret/visualize the large data sets including, but not limited to, high-throughput measurements of biological data (e.g., single-cell RNA-seq) which we mainly focus on. 
 
-ddhodge is built on a mathematical framework of Hodge decomposition on simplicial complex that gives us fruitful analogy of gradient, curl and harmonic (cyclic) flows on manifold. ddhoge can thus potentially handles any (both of directed acyclic and cyclic) graph structure; however, the first version of this package implements only `diffusionGraph` which is a potential flow (directed acyclic graph).
+ddhodge is built on a mathematical framework of Hodge decomposition on simplicial complex that gives us fruitful analogy of gradient, curl and harmonic (cyclic) flows on manifold. ddhoge can thus potentially handles any (both of acyclic and cyclic) directed graph structure; however, the first version of this package implements only `diffusionGraph` which gives a potential flow (directed acyclic graph).
 
 Installation
 ------------

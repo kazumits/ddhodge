@@ -38,7 +38,7 @@ as_altmat <- function(g,attr="weight") {
 #' Construction of diffusion graph
 #'
 #' Construct graph from data matrix based on diffusion maps (Coifman, 2015) with adaptive scaling according to local density.
-#' @param X data matrix (row: n samples, rows: p variables)
+#' @param X data matrix (columns: n samples, rows: p variables)
 #' @param roots indices of columns of X or logical vector; start points of diffusion (i.e., the initial density is 1/n at specified n points).
 #' @param k integer; number of nearest neighbours to construct initial k-NN graph
 #' @param npc integer; number of principal components in calculating euclid distance.
