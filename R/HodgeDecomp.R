@@ -1,16 +1,5 @@
 ## Hodge decomposition toolkit
 
-randomalt <- function(n,p=c(0.9,0.05,0.05)) {
-  A <- matrix(sample(c(0,1,2),n*n,prob=p,replace=TRUE),n)
-  A-t(A)
-}
-
-get.altmat <- function(g,attr="weight") {
-  if(igraph::ecount(g)==0) return(matrix(0,igraph::vcount(g),igraph::vcount(g)))
-  A <- igraph::get.adjacency(g,attr=attr)
-  A - t(A)
-}
-
 #' Gradient operator on graph
 #'
 #' node -> edge
@@ -76,17 +65,17 @@ laplacian0 <- function(g) Matrix::crossprod(gradop(g))
 #' @param g igraph object
 #' @export
 laplacian1 <- function(g)
-  Matrix::tcrossprod(gradop(g)) + Matrix::crossprod(curlop(g))
+  Matrix::crossprod(curlop(g)) - Matrix::tcrossprod(gradop(g))
 
-#' Potential of nodes
+#' Calculate potential
 #'
-#' some description
+#' graph -> numeric vector
 #' @param g igraph object
 #' @param bias bias term in ridge regression
 #' @export
 potential <- function(g,bias=0) {
   L <- igraph::laplacian_matrix(igraph::as.undirected(g),weight=NA)
-  # Solve the normal equation
+  # Solve the normal equation through QR decomposition
   p <- Matrix::solve(Matrix::qr(L),-div(g))
   #p <- Matrix::solve(Matrix::qr(L + bias*diag(ncol(L))),-div(g))
   #p <- drop(qr.fitted(qr(L + bias*diag(ncol(L))),-div(g)))
@@ -96,24 +85,25 @@ potential <- function(g,bias=0) {
   p - min(p)
 }
 
-#' Gradient of edges
+#' Calculate gradient
 #'
-#' node -> edge
+#' graph -> numeric vector
+#' Extract gradient flow by orthogonal projection
 #' @param g igraph object
 #' @param bias bias term in ridge regression
 #' @export
 grad <- function(g,bias=0) as.numeric(gradop(g)%*%potential(g,bias))
 
-#' Divergence of nodes
+#' Calculate divergence
 #'
-#' node -> edge
+#' graph -> numeric vector
 #' @param g igraph object
 #' @export
 div <- function(g) as.numeric(divop(g)%*%igraph::E(g)$weight)
 
-#' Curl of cliques (triangles)
+#' Calculate curl of cliques (triangles)
 #'
-#' node -> edge
+#' graph -> numeric vector
 #' @param g igraph object
 #' @export
 curl <- function(g) drop(curlop(g)%*%igraph::E(g)$weight)

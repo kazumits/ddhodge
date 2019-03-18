@@ -2,7 +2,7 @@
 % Please edit documentation in R/HodgeDecomp.R
 \name{curl}
 \alias{curl}
-\title{Curl of cliques (triangles)}
+\title{Calculate curl of cliques (triangles)}
 \usage{
 curl(g)
 }
@@ -10,5 +10,5 @@ curl(g)
 \item{g}{igraph object}
 }
 \description{
-node -> edge
+graph -> numeric vector
 }

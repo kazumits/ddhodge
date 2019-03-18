@@ -2,7 +2,7 @@
 % Please edit documentation in R/HodgeDecomp.R
 \name{grad}
 \alias{grad}
-\title{Gradient of edges}
+\title{Calculate gradient}
 \usage{
 grad(g, bias = 0)
 }
@@ -12,5 +12,6 @@ grad(g, bias = 0)
 \item{bias}{bias term in ridge regression}
 }
 \description{
-node -> edge
+graph -> numeric vector
+Extract gradient flow by orthogonal projection
 }

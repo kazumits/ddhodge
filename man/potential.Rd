@@ -2,7 +2,7 @@
 % Please edit documentation in R/HodgeDecomp.R
 \name{potential}
 \alias{potential}
-\title{Potential of nodes}
+\title{Calculate potential}
 \usage{
 potential(g, bias = 0)
 }
@@ -12,5 +12,5 @@ potential(g, bias = 0)
 \item{bias}{bias term in ridge regression}
 }
 \description{
-some description
+graph -> numeric vector
 }

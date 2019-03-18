@@ -11,7 +11,7 @@ diffusionMaps(R, k = 7, sigma = NULL)
 
 \item{k}{number of neighbours in adaptive-scaling. (ignored if sigma is specified)}
 
-\item{sigma}{fixed sigma for isotopic diffusion}
+\item{sigma}{fixed sigma for isotropic diffusion}
 }
 \description{
 equivalent to diffusion maps (Coifman, 2015) with adaptive scaling according to local density.

@@ -8,7 +8,7 @@ diffusionGraph(X, roots, k = 11, npc = min(1000, dim(X)), ndc = 40,
   s = 1, j = 7, lambda = 1e-04, sigma = NULL)
 }
 \arguments{
-\item{X}{data matrix (row: n samples, rows: p variables)}
+\item{X}{data matrix (columns: n samples, rows: p variables)}
 
 \item{roots}{indices of columns of X or logical vector; start points of diffusion (i.e., the initial density is 1/n at specified n points).}
 

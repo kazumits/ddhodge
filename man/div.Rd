@@ -2,7 +2,7 @@
 % Please edit documentation in R/HodgeDecomp.R
 \name{div}
 \alias{div}
-\title{Divergence of nodes}
+\title{Calculate divergence}
 \usage{
 div(g)
 }
@@ -10,5 +10,5 @@ div(g)
 \item{g}{igraph object}
 }
 \description{
-node -> edge
+graph -> numeric vector
 }

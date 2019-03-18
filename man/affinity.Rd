@@ -11,7 +11,7 @@ affinity(R, k = 7, sigma = NULL, log = FALSE, normalize = FALSE)
 
 \item{k}{integer; number of neighbours in adaptive-scaling. (ignored if sigma is specified)}
 
-\item{sigma}{numeric; fixed sigma for isotopic diffusion}
+\item{sigma}{numeric; fixed sigma for isotropic diffusion}
 
 \item{log}{logical; if TRUE, log-transformed affinity matrix is returned.}
 

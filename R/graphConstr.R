@@ -35,6 +35,12 @@ as_altmat <- function(g,attr="weight") {
   A - Matrix::t(A)
 }
 
+# Construct random alternating matrix: just for test purpose
+randomalt <- function(n,p=c(0.9,0.05,0.05)) {
+  A <- matrix(sample(c(0,1,2),n*n,prob=p,replace=TRUE),n)
+  A-t(A)
+}
+
 #' Construction of diffusion graph
 #'
 #' Construct graph from data matrix based on diffusion maps (Coifman, 2015) with adaptive scaling according to local density.
@@ -51,10 +57,12 @@ as_altmat <- function(g,attr="weight") {
 #' @references "Diffusion maps"
 #' @references "Self-tuning spectral clustering"
 diffusionGraph <- function(X,roots,k=11,npc=min(1000,dim(X)),ndc=40,s=1,j=7,lambda=1e-4,sigma=NULL){
-  Y <- t(log(gscale(X+1)))
+  Y <- t(log(gscale(X+0.5)))
   pc <- stats::prcomp(Y,center=TRUE,scale=FALSE)$x
   # Euclid distance matrix
   R <- stats::dist(pc[,1:npc])
+  #M <- affinity(R,normalize = TRUE)
+  #A <- M - t(M)
   d <- diffusionMaps(R,j,sigma)
   # Diffusion distance matrix
   W <- with(d,as.matrix(dist(Psi%*%diag(eig^s)[,seq(2,ndc+1)])))
@@ -66,12 +74,22 @@ diffusionGraph <- function(X,roots,k=11,npc=min(1000,dim(X)),ndc=40,s=1,j=7,lamb
   #u <- -log(colMeans(M[roots,,drop=FALSE]))
   names(u) <- colnames(X)
   # approximated -grad (related to directional deriv.?)
-  A <- outer(u,u,"-")
+  A <- outer(u,u,"-")#/W
+  #P <- with(d,Psi%*%diag(colSums(outer(1:10,eig,`^`)))%*%t(Phi))
+  #P <- with(d,Psi[,1]%*%t(Psi[1,]))
+  #P <- with(d,Psi %*% diag(eig-1) %*% diag(sapply(eig,function(x) sum(x^seq(0,100)))) %*% t(Phi)) # totalflow
+  #A <- P-t(P)
   # divergence of fully-connected diffusion graph
   div_o <- drop(div(graph_altmat(A)))
+  u_o <- drop(potential(graph_altmat(A)))
   # k-NN graph using diffusion distance
-  A[!(apply(W,1,knn,k) | t(apply(W,1,knn,k)))] <- 0
+  nei <- apply(W,1,knn,k)
+  A[!(nei|t(nei))] <- 0
   g <- graph_altmat(A)
+  # Pulling back the original potential using pruned graph
+  #Lgi <- MASS::ginv(as.matrix(laplacian0(g)))
+  #div_s <- glmnet::glmnet(Lgi,u_o,alpha=0.5,lambda=lambda)$beta
+  #igraph::E(g)$weight <- gradop(g)%*%Lgi%*%div_s
   # Pulling back the original divergence using pruned graph
   igraph::E(g)$weight <- Matrix::solve(
     Matrix::crossprod(divop(g))+lambda*diag(igraph::ecount(g)),
@@ -81,6 +99,7 @@ diffusionGraph <- function(X,roots,k=11,npc=min(1000,dim(X)),ndc=40,s=1,j=7,lamb
   # drop edges with 0 weights and flip edges with negative weights
   g <- graph_altmat(as_altmat(g))
   igraph::V(g)$u <- potential(g)
+  igraph::V(g)$u_o <- u_o
   igraph::V(g)$div <- div(g)
   igraph::V(g)$div_o <- div_o
   return(g)
