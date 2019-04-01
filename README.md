@@ -3,8 +3,6 @@
 ddhodge
 =======
 
-*Modeling Latent Flow Structure using Hodge Decomposition*
-
 The goal of ddhodge is to be a toolkit to analyse underlying "flow" structure (e.g., time or causal relations) in the *hodge-podge* collection of data points. ddhodge will help to interpret/visualize the large data sets including, but not limited to, high-throughput measurements of biological data (e.g., single-cell RNA-seq) which we mainly focus on.
 
 ddhodge is built on a mathematical framework of Hodge decomposition on simplicial complex that gives us fruitful analogy of gradient, curl and harmonic (cyclic) flows on manifold. ddhoge can thus potentially handles any (both of acyclic and cyclic) directed graph structure.
@@ -23,7 +21,9 @@ devtools::install_github("kazumits/ddhodge")
 Methods
 -------
 
-*In preparation*
+Please refer to our preprint.
+
+-   Modeling latent flows on single cell data using the Hodge decomposition <https://doi.org/10.1101/592089>
 
 Example
 -------
