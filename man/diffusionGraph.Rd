@@ -4,8 +4,8 @@
 \alias{diffusionGraph}
 \title{Construction of diffusion graph}
 \usage{
-diffusionGraph(X, roots, k = 11, npc = min(1000, dim(X)), ndc = 40,
-  s = 1, j = 7, lambda = 1e-04, sigma = NULL)
+diffusionGraph(X, roots, k = 11, npc = min(100, dim(X) - 1),
+  ndc = 40, s = 1, j = 7, lambda = 1e-04, sigma = NULL)
 }
 \arguments{
 \item{X}{data matrix (columns: n samples, rows: p variables)}

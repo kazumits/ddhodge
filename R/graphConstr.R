@@ -56,20 +56,29 @@ randomalt <- function(n,p=c(0.9,0.05,0.05)) {
 #' @export
 #' @references "Diffusion maps"
 #' @references "Self-tuning spectral clustering"
-diffusionGraph <- function(X,roots,k=11,npc=min(1000,dim(X)),ndc=40,s=1,j=7,lambda=1e-4,sigma=NULL){
+diffusionGraph <- function(X,roots,k=11,npc=min(100,dim(X)-1),ndc=40,s=1,j=7,lambda=1e-4,sigma=NULL){
+  cat("Normalization: ",file=stderr())
   Y <- t(log(gscale(X+0.5)))
-  pc <- stats::prcomp(Y,center=TRUE,scale=FALSE)$x
+  cat("done.",file=stderr(),fill=TRUE)
+  #Y <- Matrix::t(X)
+  #pc <- stats::prcomp(Y,center=TRUE,scale=FALSE)$x[,seq(npc)]
+  cat("Pre-PCA: ",file=stderr())
+  pc <- irlba::prcomp_irlba(Y,npc,center=TRUE,scale=FALSE)$x
+  cat("done.",file=stderr(),fill=TRUE)
   # Euclid distance matrix
-  R <- stats::dist(pc[,1:npc])
+  R <- stats::dist(pc)
   #M <- affinity(R,normalize = TRUE)
   #A <- M - t(M)
+  cat("Diffusionmaps: ",file=stderr())
   d <- diffusionMaps(R,j,sigma)
+  cat("done.",file=stderr(),fill=TRUE)
   # Diffusion distance matrix
   W <- with(d,as.matrix(dist(Psi%*%diag(eig^s)[,seq(2,ndc+1)])))
   # Transition matrix at t=s
   M <- with(d,Psi%*%diag(eig^s)%*%t(Phi))
   # Set potential as density at time t=s
   u <- colMeans(M[roots,,drop=FALSE])
+  #u <- -log(d$Phi[,1])
   # Set potential u=-log(p) where p is density at time t=s
   #u <- -log(colMeans(M[roots,,drop=FALSE]))
   names(u) <- colnames(X)
@@ -80,8 +89,11 @@ diffusionGraph <- function(X,roots,k=11,npc=min(1000,dim(X)),ndc=40,s=1,j=7,lamb
   #P <- with(d,Psi %*% diag(eig-1) %*% diag(sapply(eig,function(x) sum(x^seq(0,100)))) %*% t(Phi)) # totalflow
   #A <- P-t(P)
   # divergence of fully-connected diffusion graph
-  div_o <- drop(div(graph_altmat(A)))
-  u_o <- drop(potential(graph_altmat(A)))
+  g_o <- graph_altmat(A)
+  #return(g_o)
+  cat("Rewiring: ",file=stderr())
+  div_o <- drop(div(g_o))
+  # u_o <- drop(potential(g_o)) # time consuming
   # k-NN graph using diffusion distance
   nei <- apply(W,1,knn,k)
   A[!(nei|t(nei))] <- 0
@@ -98,9 +110,37 @@ diffusionGraph <- function(X,roots,k=11,npc=min(1000,dim(X)),ndc=40,s=1,j=7,lamb
   igraph::E(g)$weight <- grad(g)
   # drop edges with 0 weights and flip edges with negative weights
   g <- graph_altmat(as_altmat(g))
+  cat("done.",file=stderr(),fill=TRUE)
   igraph::V(g)$u <- potential(g)
-  igraph::V(g)$u_o <- u_o
+  #igraph::V(g)$u_o <- u_o
   igraph::V(g)$div <- div(g)
   igraph::V(g)$div_o <- div_o
   return(g)
+}
+
+#' Multi-source multi-sink maximum flow
+#'
+#' Simple extension of `max_flow` for multi-source/sink.
+#' @param g igraph object
+#' @param source sourse(s)
+#' @param sink sink(s)
+#' @return igraph object with `E(g)$flow` and `V(g)$pass` attributes.
+#' @export
+multimaxflow <- function(g,source,sink)
+{
+  usrc <- igraph::vcount(g) + 1 # super-source
+  usink <- usrc + 1 # super-sink
+  h <- igraph::add_edges(
+    igraph::add_vertices(g,2),
+    t(rbind(
+      cbind(usrc,source),
+      cbind(sink,usink)
+    )),
+    # not to exceeds any maximum flow
+    attr=list(weight=sum(igraph::E(g)$weight))
+  )
+  mf <- igraph::max_flow(h,usrc,usink,igraph::E(h)$weight)
+  igraph::E(h)$flow <- mf$flow
+  igraph::V(h)$pass <- igraph::strength(h,mode="in",weights=mf$flow)
+  igraph::delete_vertices(h,c(usrc,usink))
 }

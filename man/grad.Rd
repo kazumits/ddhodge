@@ -4,12 +4,12 @@
 \alias{grad}
 \title{Calculate gradient}
 \usage{
-grad(g, bias = 0)
+grad(g, tol = 1e-07)
 }
 \arguments{
 \item{g}{igraph object}
 
-\item{bias}{bias term in ridge regression}
+\item{tol}{tolerance for solve.QR}
 }
 \description{
 graph -> numeric vector

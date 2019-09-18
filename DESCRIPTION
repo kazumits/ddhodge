@@ -1,6 +1,6 @@
 Package: ddhodge
 Title: Modeling Latent Flow Structure using Hodge Decomposition
-Version: 0.1
+Version: 0.11
 Authors@R: 
     person(given = "Kazumitsu",
            family = "Maehara",
@@ -16,7 +16,8 @@ Suggests:
     rmarkdown
 Imports: 
     Matrix,
-    igraph
+    igraph,
+    irlba
 Language: en-US
 URL: https://github.com/kazumits/ddhodge
 BugReports: https://github.com/kazumits/ddhodge/issues

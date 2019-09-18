@@ -4,12 +4,12 @@
 \alias{potential}
 \title{Calculate potential}
 \usage{
-potential(g, bias = 0)
+potential(g, tol = 1e-07)
 }
 \arguments{
 \item{g}{igraph object}
 
-\item{bias}{bias term in ridge regression}
+\item{tol}{tolerance for solve.QR}
 }
 \description{
 graph -> numeric vector
