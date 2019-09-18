@@ -18,8 +18,7 @@ any (both of acyclic and cyclic) directed graph structure.
 The first version of this package implements `diffusionGraph` as a
 design of edges. The resulting graph consists of sparse gradient flows
 (i.e. pure directed acyclic graph) and is suitable to sketch out the
-ideas from a simplified flow network of a stochastic process along
-high-dimensional energy landscape.
+ideas from a simplified flow network.
 
 ## Installation
 
@@ -74,10 +73,10 @@ X <- 2^X[apply(X,1,var)>0,] - 1
 
 #### The ddhodge part
 
-Specify input data matrix and roots (starting points).
+Specify input data matrix (raw UMI counts) and the indices of starting
+cells (roots).
 
 ``` r
-#g <- diffusionGraph(X,group=="MEF",k=11,npc=50,ndc=20,s=10)
 g <- diffusionGraph(X,group=="MEF",k=7,npc=100,ndc=40,s=2)
 ```
 
@@ -89,23 +88,19 @@ dggraph <- function(g,...)
   geom_edge_link(
     aes(width=weight),
     colour="black",
-    #arrow=arrow(length=unit(1.8,"mm")),
     arrow=arrow(length=unit(2.4,"mm")),
-    #end_cap = circle(1.2,'mm'), alpha=0.6,
     end_cap = circle(1.2,'mm'),
   ) + scale_edge_width(range=c(0.2,0.5)) +
   geom_node_point(...)
 
 igraph::V(g)$group <- group
-#set.seed(123) # for reproducible graph layout
-set.seed(321) # for reproducible graph layout
-lo <- create_layout(g,"fr")
+# stress layout gives a nice visualization for >1k cells
+lo <- create_layout(g,"stress")
 
 p1 <- dggraph(lo,aes(colour=group),size=2) +
   ggtitle("Sparse reconstruction of diffusion process (k=7)") +
   scale_color_d3("category10")
 
-#p2 <- dggraph(lo,aes(colour=div,size=div^2)) +
 p2 <- dggraph(lo,aes(colour=div),size=3) +
   ggtitle("Divergence tells us the source and sink.") +
   scale_color_gradient2(low="blue",mid="grey",high="red")
@@ -140,15 +135,24 @@ print(list(p1,p2,p3,p4))
 
 <img src="man/figures/README-drawGraph-4.png" width="100%" />
 
+Here is the another application to the large cell number of 10X Chromium
+data by Hochgerner et al. (Nature Neuroscience, 2018) with the
+parameters: `group=="nIPC",k=7,npc=100,ndc=40,s=3`.
+
+![ex\_10X](man/figures/dentate-gyrus-neurogenesis_hochgerner.png)
+
+The count matrix was downlowded from
+<https://zenodo.org/record/1443566>.
+
 ### Max-flow
 
-Max-flow as a mainstream of paths between specified source-sink pair.
+Max-flow algorithm can be used to extract main/sub-streams between the
+specified source-sink clusters.
 
 ``` r
 g <- multimaxflow(g,which(group=="MEF"),which(group=="Neuron")[10:15])
 #g <- multimaxflow(g,which(group=="MEF"),which(group=="Myocyte")[10:15])
-set.seed(321)
-ggraph(g,"lgl") + theme_void() +
+ggraph(g,"stress") + theme_void() +
   geom_node_point(aes(colour=group,size=pass)) +
   geom_edge_link(
     aes(width=flow),
@@ -162,7 +166,7 @@ ggraph(g,"lgl") + theme_void() +
 
 ## TODO
 
-  - Add more examples and documentations
+  - Add more appealing demos and documentations
   - Construction of causal and cyclic flows
   - Pseudo-dynamics reconstruction using extracted pseudo-time
     structures

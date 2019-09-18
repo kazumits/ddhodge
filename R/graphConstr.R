@@ -60,8 +60,6 @@ diffusionGraph <- function(X,roots,k=11,npc=min(100,dim(X)-1),ndc=40,s=1,j=7,lam
   cat("Normalization: ",file=stderr())
   Y <- t(log(gscale(X+0.5)))
   cat("done.",file=stderr(),fill=TRUE)
-  #Y <- Matrix::t(X)
-  #pc <- stats::prcomp(Y,center=TRUE,scale=FALSE)$x[,seq(npc)]
   cat("Pre-PCA: ",file=stderr())
   pc <- irlba::prcomp_irlba(Y,npc,center=TRUE,scale=FALSE)$x
   cat("done.",file=stderr(),fill=TRUE)
