@@ -135,15 +135,6 @@ print(list(p1,p2,p3,p4))
 
 <img src="man/figures/README-drawGraph-4.png" width="100%" />
 
-Here is the another application to the large cell number of 10X Chromium
-data by Hochgerner et al. (Nature Neuroscience, 2018) with the
-parameters: `group=="nIPC",k=7,npc=100,ndc=40,s=3`.
-
-![ex\_10X](man/figures/dentate-gyrus-neurogenesis_hochgerner.png)
-
-The count matrix was downlowded from
-<https://zenodo.org/record/1443566>.
-
 ### Max-flow
 
 Max-flow algorithm can be used to extract main/sub-streams between the
@@ -163,6 +154,17 @@ ggraph(g,"stress") + theme_void() +
 ```
 
 <img src="man/figures/README-maxflow-1.png" width="100%" />
+
+### Application to the large cell number
+
+Here is the demonstration for the large cell number of 10x Chromium data
+by Hochgerner et al. (Nature Neuroscience, 2018)
+
+![ex\_10x](man/figures/dentate-gyrus-neurogenesis_hochgerner.png)
+
+The graph was constructed with the parameters:
+`group=="nIPC",k=7,npc=100,ndc=40,s=3`. The count matrix (3,585 cells x
+2,182 genes) was downlowded from <https://zenodo.org/record/1443566>.
 
 ## TODO
 

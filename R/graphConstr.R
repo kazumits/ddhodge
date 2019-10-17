@@ -102,8 +102,8 @@ diffusionGraph <- function(X,roots,k=11,npc=min(100,dim(X)-1),ndc=40,s=1,j=7,lam
   #igraph::E(g)$weight <- gradop(g)%*%Lgi%*%div_s
   # Pulling back the original divergence using pruned graph
   igraph::E(g)$weight <- Matrix::solve(
-    Matrix::crossprod(divop(g))+lambda*diag(igraph::ecount(g)),
-    -gradop(g)%*%div_o
+    Matrix::crossprod(divop(g))+lambda*Matrix::Diagonal(igraph::ecount(g)),
+    -gradop(g)%*%div_o,
   )
   igraph::E(g)$weight <- grad(g)
   # drop edges with 0 weights and flip edges with negative weights

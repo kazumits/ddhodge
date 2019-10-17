@@ -113,12 +113,6 @@ p4 <- create_layout(g,"tree") %>%
 print(list(p1,p2,p3,p4))
 ```
 
-Here is the another application to the large cell number of 10X Chromium data by Hochgerner et al. (Nature Neuroscience, 2018) with the parameters: `group=="nIPC",k=7,npc=100,ndc=40,s=3`.
-
-![ex_10X](man/figures/dentate-gyrus-neurogenesis_hochgerner.png)
-
-The count matrix was downlowded from <https://zenodo.org/record/1443566>.
-
 ### Max-flow
 
 Max-flow algorithm can be used to extract main/sub-streams between the specified source-sink clusters.
@@ -135,6 +129,14 @@ ggraph(g,"stress") + theme_void() +
     end_cap = circle(1.2,'mm'), alpha=0.6,
 ) + scale_edge_width(range=c(0,3)) + scale_color_d3("category10")
 ```
+
+### Application to the large cell number
+
+Here is the demonstration for the large cell number of 10x Chromium data by Hochgerner et al. (Nature Neuroscience, 2018)
+
+![ex_10x](man/figures/dentate-gyrus-neurogenesis_hochgerner.png)
+
+The graph was constructed with the parameters: `group=="nIPC",k=7,npc=100,ndc=40,s=3`. The count matrix (3,585 cells x 2,182 genes) was downlowded from <https://zenodo.org/record/1443566>.
 
 
 TODO
