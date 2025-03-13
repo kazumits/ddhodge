@@ -3,6 +3,14 @@
 
 # ddhodge
 
+## Announcement (2025/3/12)
+
+This R package is outdated. Please see the Julia package
+[ddHodge.jl](https://github.com/kazumits/ddHodge.jl) and
+try the new functionality in the updated ddHodge.
+
+---
+
 The goal of ddhodge is to be a toolkit to analyse underlying “flow”
 structure (e.g., time or causal relations) in the *hodge-podge*
 collection of data points. ddhodge will help to interpret/visualize the
